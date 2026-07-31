@@ -1,24 +1,29 @@
 import router from '@ohos.router';
 
+// 售后退款项接口
+interface AfterSaleItem {
+  orderNo: string,
+  refundNo: string,
+  time: string,
+  status: string,
+  prodName: string,
+  prodImg: ResourceStr,
+  price: string,
+  total: string
+}
+
 @Entry
 @Component
 struct AfterSaleListPage {
   // 模拟售后退款列表数据
-  private afterSaleList: Array<{
-    orderNo: string,
-    refundNo: string,
-    time: string,
-    status: string,
-    prodName: string,
-    price: string,
-    total: string
-  }> = [
+  private afterSaleList: AfterSaleItem[] = [
     {
       orderNo: '2125538995000052',
       refundNo: '2300784962519552',
       time: '2099-05-13 14:49:57',
       status: '退款成功',
       prodName: '东北五常大米 10kg',
+      prodImg: $r('app.media.wuchangdami'),
       price: '￥68.90',
       total: '￥ 68.90'
     }
@@ -28,7 +33,7 @@ struct AfterSaleListPage {
     Column() {
       // === 1. 顶部标题栏 ===
       Row() {
-        Image($r('app.media.startIcon'))
+        Image($r('app.media.back'))
           .width(20).height(20).margin({ right: 12 })
           .onClick(() => { router.back(); })
 
@@ -50,16 +55,19 @@ struct AfterSaleListPage {
       Scroll() {
         Column() {
           List({ space: 12 }) {
-            ForEach(this.afterSaleList, (item) => {
+            ForEach(this.afterSaleList, (item: AfterSaleItem) => {
               ListItem() {
                 this.AfterSaleCard(item)
               }
-            })
+            }, (item: AfterSaleItem) => item.refundNo)
           }
           .width('92%')
-          .padding({ top: 12, bottom: 20 })
+          .padding({ bottom: 20 })
         }
         .width('100%')
+        .height('100%')
+        .justifyContent(FlexAlign.Start)
+        .alignItems(HorizontalAlign.Center)
       }
       .scrollBar(BarState.Off)
       .layoutWeight(1)
@@ -71,15 +79,7 @@ struct AfterSaleListPage {
   }
 
   // --- 局部复用组件：单条售后退款卡片 ---
-  @Builder AfterSaleCard(item: {
-    orderNo: string,
-    refundNo: string,
-    time: string,
-    status: string,
-    prodName: string,
-    price: string,
-    total: string
-  }) {
+  @Builder AfterSaleCard(item: AfterSaleItem) {
     Column() {
       // 1. 卡片头部：订单号与退款状态
       Row() {
@@ -104,11 +104,11 @@ struct AfterSaleListPage {
       .width('100%')
       .margin({ bottom: 12 })
 
-      Divider().color('#F0F0F0I').strokeWidth(0.5).margin({ bottom: 12 })
+      Divider().color('#F0F0F0').strokeWidth(0.5).margin({ bottom: 12 })
 
       // 2. 商品缩略信息
       Row() {
-        Image($r('app.media.startIcon'))
+        Image(item.prodImg)
           .width(60)
           .height(60)
           .borderRadius(6)
@@ -159,7 +159,7 @@ struct AfterSaleListPage {
           .fontSize(13)
           .borderRadius(15)
           .onClick(() => {
-            // router.pushUrl({ url: 'pages/profile/RefundDetailPage' })
+            router.pushUrl({ url: 'pages/order/RefundDetailPage' })
           })
       }
       .width('100%')

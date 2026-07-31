@@ -1,20 +1,28 @@
 
 import router from '@ohos.router';
 
+interface HistoryItem {
+  title: string;
+  desc: string;
+  price: string;
+  time: string;
+  icon?: Resource;
+  productIndex?: number; // 商品索引，用于跳转到对应的商品详情页
+}
+
 @Entry
 @Component
 struct BrowsingHistoryPage {
   // 核心状态：是否处于管理编辑模式
   @State isManaging: boolean = false;
   // 模拟足迹列表数据
-  private todayHistory: Array<{ title: string, desc: string, price: string, time: string }> = [
-    { title: '广州酒家核桃包 330g', desc: '五分钟快蒸，绵糯多汁，…', price: '¥ 14.5', time: '今天 11:14' }
+  private todayHistory: HistoryItem[] = [
+    { title: '广州酒家核桃包 330g', desc: '五分钟快蒸，绵糯多汁，…', price: '¥ 14.5', time: '今天 11:14', icon: $r('app.media.hetao'), productIndex: 5 }
   ];
-  private earlyHistory: Array<{ title: string, desc: string, price: string, time: string }> = [
-    { title: '云南白药牙膏 2支装', desc: '薄荷型+留兰型', price: '¥ 38.9', time: '2099-08-10 18:26' },
-    { title: '清风抽纸 300张', desc: '印花加厚3小包抽纸', price: '¥ 29.8', time: '2099-08-09 16:55' },
-    { title: '云南白药牙膏 2支装', desc: '2支薄荷型', price: '¥ 38.9', time: '2099-08-09 16:54' },
-    { title: '佳洁士牙膏 1支装', desc: '全线新装升级，3D炫白', price: '¥ 18.9', time: '2099-08-09 16:50' }
+  private earlyHistory: HistoryItem[] = [
+    { title: '云南白药牙膏 2支装', desc: '薄荷型+留兰型', price: '¥ 38.9', time: '2099-08-10 18:26', icon: $r('app.media.yunnanbaiyao'), productIndex: 0 },
+    { title: '清风抽纸 300张', desc: '印花加厚3小包抽纸', price: '¥ 29.8', time: '2099-08-09 16:55', icon: $r('app.media.qingfeng'), productIndex: 1 },
+    { title: '佳洁士牙膏 1支装', desc: '全线新装升级，3D炫白', price: '¥ 18.9', time: '2099-08-09 16:50', icon: $r('app.media.jiajieshi'), productIndex: 2 }
   ];
 
   build() {
@@ -24,7 +32,7 @@ struct BrowsingHistoryPage {
       Column() {
         // 顶部导航栏
         Row() {
-          Image($r('app.media.startIcon'))
+          Image($r('app.media.back'))
             .width(20).height(20).margin({ right: 12 })
             .onClick(() => { router.back(); })
 
@@ -57,11 +65,11 @@ struct BrowsingHistoryPage {
               .fontWeight(FontWeight.Bold)
               .fontColor('#333333')
               .width('100%')
-              .margin({ top: 16, bottom: 8, left: 16 })
+              .margin({ bottom: 8, left: 16 })
 
             Column() {
-              ForEach(this.todayHistory, (item) => {
-                this.HistoryItemRow(item.title, item.desc, item.price, item.time)
+              ForEach(this.todayHistory, (item: HistoryItem) => {
+                this.HistoryItemRow(item.title, item.desc, item.price, item.time, item.icon, item.productIndex)
               })
             }
             .width('92%')
@@ -76,11 +84,11 @@ struct BrowsingHistoryPage {
               .fontWeight(FontWeight.Bold)
               .fontColor('#333333')
               .width('100%')
-              .margin({ top: 20, bottom: 8, left: 16 })
+              .margin({ top: 16, bottom: 8, left: 16 })
 
             Column() {
-              ForEach(this.earlyHistory, (item) => {
-                this.HistoryItemRow(item.title, item.desc, item.price, item.time)
+              ForEach(this.earlyHistory, (item: HistoryItem) => {
+                this.HistoryItemRow(item.title, item.desc, item.price, item.time, item.icon, item.productIndex)
               })
             }
             .width('92%')
@@ -134,7 +142,7 @@ struct BrowsingHistoryPage {
   }
 
   // --- 局部复用组件：单条足迹行 ---
-  @Builder HistoryItemRow(title: string, desc: string, price: string, timeStr: string) {
+  @Builder HistoryItemRow(title: string, desc: string, price: string, timeStr: string, icon?: Resource, productIndex?: number) {
     Row() {
       // 如果处于管理模式，左侧显示复选框
       if (this.isManaging) {
@@ -142,11 +150,17 @@ struct BrowsingHistoryPage {
       }
 
       // 商品缩略图
-      Image($r('app.media.startIcon'))
+      Image(icon ? icon : $r('app.media.startIcon'))
         .width(70)
         .height(70)
         .borderRadius(6)
         .margin({ right: 12 })
+        .onClick(() => {
+          router.pushUrl({
+            url: 'pages/store/ProductDetailPage',
+            params: { productIndex: productIndex !== undefined ? productIndex : 0 }
+          });
+        })
 
       // 商品描述信息
       Column() {
@@ -174,7 +188,7 @@ struct BrowsingHistoryPage {
           Blank()
 
           Row({ space: 4 }) {
-            Image($r('app.media.startIcon')).width(11).height(11)
+            Image($r('app.media.pc')).width(11).height(11)
             Text(timeStr).fontSize(11).fontColor('#999999')
           }
         }
@@ -185,6 +199,6 @@ struct BrowsingHistoryPage {
     }
     .width('100%')
     .padding({ top: 8, bottom: 8 })
-    .border({ bottom: { width: 0.5, color: '#F0F0F0' } })
+    .border({ width: { bottom: 0.5 }, color: '#F0F0F0' })
   }
 }

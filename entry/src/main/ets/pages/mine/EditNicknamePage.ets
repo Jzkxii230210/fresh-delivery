@@ -4,13 +4,13 @@ import promptAction from '@ohos.promptAction';
 @Entry
 @Component
 struct EditNicknamePage {
-  @State nicknameInput: string = '张小乙是吃货';
+  @State nicknameInput: string = '毕敬明是吃货';
 
   build() {
     Column() {
       // === 1. 顶部标题栏 ===
       Row() {
-        Image($r('app.media.startIcon'))
+        Image($r('app.media.back'))
           .width(20).height(20).margin({ right: 12 })
           .onClick(() => { router.back(); })
 
@@ -41,13 +41,13 @@ struct EditNicknamePage {
             .onChange((val) => { this.nicknameInput = val; })
 
           if (this.nicknameInput.length > 0) {
-            Image($r('app.media.startIcon'))
+            Image($r('app.media.more'))
               .width(16).height(16)
               .onClick(() => { this.nicknameInput = ''; })
           }
         }
         .width('100%')
-        .border({ bottom: { width: 0.5, color: '#EFEFEF' } })
+        .border({ width: { bottom: 0.5 }, color: '#EFEFEF' })
         .margin({ bottom: 12 })
 
         // 规则说明

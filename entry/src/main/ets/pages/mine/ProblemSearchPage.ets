@@ -21,7 +21,7 @@ struct ProblemSearchPage {
     Column() {
       // === 1. 顶部搜索导航栏 ===
       Row() {
-        Image($r('app.media.startIcon'))
+        Image($r('app.media.back'))
           .width(20).height(20).margin({ right: 12 })
           .onClick(() => {
             if (this.isResultMode) {
@@ -34,7 +34,7 @@ struct ProblemSearchPage {
 
         // 搜索输入框
         Row() {
-          Image($r('app.media.startIcon')).width(16).height(16).margin({ right: 8 })
+          Image($r('app.media.search')).width(16).height(16).margin({ right: 8 })
 
           TextInput({ text: this.searchQuery, placeholder: '输入问题关键词' })
             .layoutWeight(1)
@@ -95,7 +95,7 @@ struct ProblemSearchPage {
                 .fontWeight(FontWeight.Medium)
                 .fontColor('#333333')
               Blank()
-              Image($r('app.media.startIcon')).width(16).height(16)
+              Image($r('app.media.shanchu')).width(16).height(16)
             }
             .width('100%')
             .padding({ left: 16, right: 16, top: 16, bottom: 16 })
@@ -123,20 +123,13 @@ struct ProblemSearchPage {
           .backgroundColor(Color.White)
 
           // 语音搜索悬浮球
-          Column() {
-            Circle({ width: 60, height: 60 }).fill(Color.White).shadow({ radius: 10, color: 'rgba(0,0,0,0.05)', offsetY: -2 })
-            Image($r('app.media.startIcon')).width(28).height(28).position({ x: 16, y: 16 })
-          }
-          .width(60).height(60).margin({ bottom: 40 })
         }
-        .layoutWeight(1)
-
       } else {
         // --- 搜索结果模式 ---
         Scroll() {
           Column() {
             List() {
-              ForEach(this.searchResults, (resTitle) => {
+              ForEach(this.searchResults, (resTitle: string, index: number) => {
                 ListItem() {
                   Row() {
                     // 关键词高亮演示 (这里用代码逻辑或直接组合文本展示)
@@ -151,7 +144,11 @@ struct ProblemSearchPage {
                   .width('100%')
                   .padding(16)
                   .onClick(() => {
-                    // router.pushUrl({ url: 'pages/profile/ProblemDetailPage' })
+                    // 跳转到问题详情页，传递问题标题
+                    router.pushUrl({ 
+                      url: 'pages/mine/ProblemDetailPage',
+                      params: { title: resTitle }
+                    })
                   })
                 }
               })

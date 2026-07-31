@@ -14,7 +14,7 @@ struct FeedbackPage {
     Column() {
       // === 1. 顶部标题栏 (带“我的反馈”入口) ===
       Row() {
-        Image($r('app.media.startIcon'))
+        Image($r('app.media.back'))
           .width(20).height(20).margin({ right: 12 })
           .onClick(() => { router.back(); })
 
@@ -29,7 +29,7 @@ struct FeedbackPage {
           .fontSize(14)
           .fontColor('#333333')
           .onClick(() => {
-            // router.pushUrl({ url: 'pages/profile/MyFeedbackPage' })
+            router.pushUrl({ url: 'pages/mine/MyFeedbackPage' });
           })
       }
       .width('100%')
@@ -51,7 +51,7 @@ struct FeedbackPage {
 
             // 类型标签流式布局
             Flex({ wrap: FlexWrap.Wrap }) {
-              ForEach(this.feedbackTypes, (typeItem, index) => {
+              ForEach(this.feedbackTypes, (typeItem: string, index: number) => {
                 Text(typeItem)
                   .fontSize(13)
                   .fontColor(this.selectedTypeIndex === index ? '#10C8A7' : '#666666')
@@ -90,15 +90,9 @@ struct FeedbackPage {
 
             // 图片上传预览槽
             Row({ space: 10 }) {
-              Stack({ alignContent: Alignment.TopEnd }) {
-                Image($r('app.media.startIcon')).width(75).height(75).borderRadius(6)
-                Circle({ width: 16, height: 16 }).fill('rgba(0,0,0,0.6)').margin({ top: 4, right: 4 })
-              }
-
               // 相机添加按钮
               Stack({ alignContent: Alignment.Center }) {
-                Image($r('app.media.startIcon')).width(75).height(75).borderRadius(6).backgroundColor('#F5F5F5')
-                Image($r('app.media.startIcon')).width(24).height(24)
+                Image($r('app.media.shangchuan')).width(75).height(75).borderRadius(6).backgroundColor('#F5F5F5')
               }
             }
             .width('100%')
@@ -127,13 +121,13 @@ struct FeedbackPage {
             }
             .width('100%')
             .height(45)
-            .border({ bottom: { width: 0.5, color: '#F0F0F0' } })
+            .border({ width: { bottom: 0.5 }, color: { bottom: '#F0F0F0' } })
 
             Row() {
               Text('联系方式').fontSize(14).fontColor('#666666').width(75)
               Row({ space: 4 }) {
                 Text('+86').fontSize(13).fontColor('#333333')
-                Image($r('app.media.startIcon')).width(10).height(10)
+                Image($r('app.media.xiala')).width(10).height(10)
               }
               .margin({ right: 10 })
 

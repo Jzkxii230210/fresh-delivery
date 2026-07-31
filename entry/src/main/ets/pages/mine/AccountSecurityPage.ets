@@ -12,7 +12,7 @@ struct AccountSecurityPage {
     Column() {
       // === 1. 顶部标题栏 ===
       Row() {
-        Image($r('app.media.startIcon'))
+        Image($r('app.media.back'))
           .width(20).height(20).margin({ right: 12 })
           .onClick(() => { router.back(); })
 
@@ -39,12 +39,12 @@ struct AccountSecurityPage {
               Text('手机').fontSize(14).fontColor('#333333')
               Blank()
               Text('136****5678').fontSize(13).fontColor('#666666').margin({ right: 6 })
-              Image($r('app.media.startIcon')).width(12).height(12)
+              Image($r('app.media.more')).width(12).height(12)
             }
             .width('100%')
             .padding(16)
             .onClick(() => {
-              promptAction.showToast({ message: '修改绑定手机号' });
+              router.pushUrl({ url: 'pages/mine/ChangePhonePage' });
             })
           }
           .width('92%')
@@ -66,11 +66,11 @@ struct AccountSecurityPage {
               Row() {
                 Text('微信').fontSize(14).fontColor('#333333')
                 Blank()
-                Text(this.isWeChatBound ? '小默先生' : '未绑定')
+                Text(this.isWeChatBound ? '小毕先生' : '未绑定')
                   .fontSize(13)
                   .fontColor(this.isWeChatBound ? '#666666' : '#10C8A7')
                   .margin({ right: 6 })
-                Image($r('app.media.startIcon')).width(12).height(12)
+                Image($r('app.media.more')).width(12).height(12)
               }
               .width('100%')
               .padding(16)
@@ -84,11 +84,11 @@ struct AccountSecurityPage {
               Row() {
                 Text('Apple').fontSize(14).fontColor('#333333')
                 Blank()
-                Text(this.isAppleBound ? '小默先生' : '未绑定')
+                Text(this.isAppleBound ? '小毕先生' : '未绑定')
                   .fontSize(13)
                   .fontColor(this.isAppleBound ? '#666666' : '#10C8A7')
                   .margin({ right: 6 })
-                Image($r('app.media.startIcon')).width(12).height(12)
+                Image($r('app.media.more')).width(12).height(12)
               }
               .width('100%')
               .padding(16)
@@ -117,12 +117,12 @@ struct AccountSecurityPage {
               Row() {
                 Text('注销账号').fontSize(14).fontColor('#333333')
                 Blank()
-                Image($r('app.media.startIcon')).width(12).height(12)
+                Image($r('app.media.more')).width(12).height(12)
               }
               .width('100%')
               .padding(16)
               .onClick(() => {
-                promptAction.showToast({ message: '进入账号注销流程' });
+                router.pushUrl({ url: 'pages/mine/CloseAccountPage' });
               })
             }
             .width('100%')

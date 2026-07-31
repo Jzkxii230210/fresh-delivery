@@ -1,39 +1,57 @@
 import router from '@ohos.router';
 
+// 我的评价项接口
+interface ReviewItem {
+  storeName: string,
+  time: string,
+  content: string,
+  reply?: string,
+  likeProducts: string[],
+  dislikeProducts: string[],
+  storeIcon?: Resource
+}
+
 @Entry
 @Component
 struct MyReviewsPage {
   // 模拟我的评价列表数据
-  private reviewsList: Array<{
-    storeName: string,
-    time: string,
-    content: string,
-    reply?: string,
-    likeProducts: string[],
-    dislikeProducts: string[]
-  }> = [
+  private reviewsList: ReviewItem[] = [
     {
       storeName: '天虹商场-凤凰城店',
       time: '2099-05-14 09:20:45',
       content: '盼望着，盼望着，东风来了，春天的脚步近了。一切都像刚睡醒的样子，欣欣然张开了眼。山朗润起来了，水涨起来了，太阳的脸红起来了。',
       reply: '盼望着，盼望着，东风来了，春天的脚步近了。一切都像刚睡醒的样子，欣欣然张开了眼。山朗润起来了，水涨起来了，太阳的脸红起来了。',
       likeProducts: ['东北五常大米 10kg', '本地鸡蛋8枚 约500g/份'],
-      dislikeProducts: ['水豆腐 约500g/份']
+      dislikeProducts: ['水豆腐 约500g/份'],
+      storeIcon: $r('app.media.tianhong')
     },
     {
       storeName: '天虹商场-凤凰城店',
       time: '2099-05-10 09:45:21',
       content: '盼望着，盼望着，东风来了，春天的脚步近了。一切都像刚睡醒的样子，欣欣然张开了眼。山朗润起来了，水涨起来了，太阳的脸红起来了。小草偷偷地从土地里钻出来，嫩嫩的，绿绿的。园子里，田野里，瞧去，一大片一大片满是的。',
       likeProducts: ['东北五常大米 10kg', '本地鸡蛋8枚 约500g/份'],
-      dislikeProducts: []
+      dislikeProducts: [],
+      storeIcon: $r('app.media.tianhong')
     }
   ];
+
+  // 根据商品名称获取对应的图片资源
+  private getProductImage(productName: string): Resource {
+    if (productName.includes('大米')) {
+      return $r('app.media.wuchangdami');
+    } else if (productName.includes('鸡蛋')) {
+      return $r('app.media.jidan');
+    } else if (productName.includes('豆腐')) {
+      return $r('app.media.doufu');
+    }
+    return $r('app.media.startIcon');
+  }
 
   build() {
     Column() {
       // === 1. 顶部标题栏 ===
       Row() {
-        Image($r('app.media.startIcon'))
+        Image($r('app.media.back'))
           .width(20)
           .height(20)
           .margin({ right: 12 })
@@ -57,11 +75,11 @@ struct MyReviewsPage {
       Scroll() {
         Column() {
           List({ space: 12 }) {
-            ForEach(this.reviewsList, (item) => {
+            ForEach(this.reviewsList, (item: ReviewItem) => {
               ListItem() {
                 this.ReviewCard(item)
               }
-            })
+            }, (item: ReviewItem) => item.time + item.storeName)
           }
           .width('92%')
           .padding({ top: 12, bottom: 20 })
@@ -78,18 +96,11 @@ struct MyReviewsPage {
   }
 
   // --- 局部复用组件：单条评价卡片 ---
-  @Builder ReviewCard(review: {
-    storeName: string,
-    time: string,
-    content: string,
-    reply?: string,
-    likeProducts: string[],
-    dislikeProducts: string[]
-  }) {
+  @Builder ReviewCard(review: ReviewItem) {
     Column() {
       // 1. 卡片头部：店铺Logo、名称与评价时间
       Row() {
-        Image($r('app.media.startIcon'))
+        Image(review.storeIcon ? review.storeIcon : $r('app.media.startIcon'))
           .width(32)
           .height(32)
           .borderRadius(16)
@@ -105,7 +116,7 @@ struct MyReviewsPage {
           // 5星评分图标模拟
           Row({ space: 2 }) {
             ForEach([1, 2, 3, 4, 5], () => {
-              Image($r('app.media.startIcon')).width(10).height(10)
+              Image($r('app.media.haoping')).width(10).height(10)
             })
           }
         }
@@ -149,13 +160,13 @@ struct MyReviewsPage {
         Column({ space: 8 }) {
           Row({ space: 6 }) {
             // 点赞大拇指图标
-            Image($r('app.media.startIcon')).width(14).height(14)
+            Image($r('app.media.dianzan')).width(14).height(14)
           }
           .margin({ bottom: 4 })
 
-          ForEach(review.likeProducts, (prodName) => {
+          ForEach(review.likeProducts, (prodName: string) => {
             Row() {
-              Image($r('app.media.startIcon'))
+              Image(this.getProductImage(prodName))
                 .width(24)
                 .height(24)
                 .borderRadius(4)
@@ -167,6 +178,7 @@ struct MyReviewsPage {
             }
             .width('100%')
             .margin({ bottom: 4 })
+            .onClick(() => { router.pushUrl({ url: 'pages/store/ProductDetailPage' }); })
           })
         }
         .width('100%')
@@ -179,13 +191,13 @@ struct MyReviewsPage {
         Column({ space: 8 }) {
           Row({ space: 6 }) {
             // 点踩大拇指向下图标
-            Image($r('app.media.startIcon')).width(14).height(14)
+            Image($r('app.media.budianzan')).width(14).height(14)
           }
           .margin({ bottom: 4 })
 
-          ForEach(review.dislikeProducts, (prodName) => {
+          ForEach(review.dislikeProducts, (prodName: string) => {
             Row() {
-              Image($r('app.media.startIcon'))
+              Image(this.getProductImage(prodName))
                 .width(24)
                 .height(24)
                 .borderRadius(4)
@@ -196,6 +208,7 @@ struct MyReviewsPage {
                 .fontColor('#333333')
             }
             .width('100%')
+            .onClick(() => { router.pushUrl({ url: 'pages/store/ProductDetailPage' }); })
           })
         }
         .width('100%')

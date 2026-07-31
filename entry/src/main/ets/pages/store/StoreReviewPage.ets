@@ -13,7 +13,7 @@ struct StoreReviewPage {
     Column() {
       // === 1. 顶部导航栏 (含店铺缩略名与 Tab 切换) ===
       Row() {
-        Image($r('app.media.startIcon')) // 返回按钮
+        Image($r('app.media.back')) // 返回按钮
           .width(20).height(20).margin({ right: 12 })
           .onClick(() => { router.back(); })
 

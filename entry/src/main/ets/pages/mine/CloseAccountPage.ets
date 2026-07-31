@@ -13,7 +13,7 @@ struct CloseAccountPage {
     Column() {
       // === 1. 顶部标题栏 ===
       Row() {
-        Image($r('app.media.startIcon'))
+        Image($r('app.media.back'))
           .width(20).height(20).margin({ right: 12 })
           .onClick(() => {
             if (this.step === 2) {
@@ -40,7 +40,8 @@ struct CloseAccountPage {
       // === 2. 多步骤视图切换 ===
       if (this.step === 1) {
         // --- 步骤一：注销须知说明页 ---
-        Stack({ alignContent: Alignment.Bottom }) {
+        Column() {
+          // 滚动内容区
           Scroll() {
             Column() {
               Text('账号注销后，以下信息将被清空且无法找回：')
@@ -67,49 +68,53 @@ struct CloseAccountPage {
               .backgroundColor(Color.White)
               .borderRadius(12)
               .padding(16)
-              .margin({ bottom: 40 })
               .shadow({ radius: 4, color: 'rgba(0,0,0,0.03)', offsetY: 2 })
-
-              // 底部按钮
-              Button('注销账号')
-                .width('100%')
-                .height(44)
-                .backgroundColor(this.isAgreed ? '#10C8A7' : '#A0E8D7')
-                .fontColor(Color.White)
-                .fontSize(16)
-                .fontWeight(FontWeight.Medium)
-                .borderRadius(22)
-                .margin({ bottom: 20 })
-                .onClick(() => {
-                  if (!this.isAgreed) {
-                    promptAction.showToast({ message: '请先阅读并勾选用户注销协议' });
-                    return;
-                  }
-                  this.step = 2; // 进入安全验证
-                })
             }
             .width('92%')
+            .padding({ bottom: 20 })
           }
           .scrollBar(BarState.Off)
           .layoutWeight(1)
 
-          // 底部协议勾选栏
-          Row({ space: 6 }) {
-            Circle({ width: 16, height: 16 })
-              .fill(this.isAgreed ? '#10C8A7' : Color.Transparent)
-              .border({ width: 1, color: this.isAgreed ? '#10C8A7' : '#CCCCCC' })
-              .onClick(() => {
-                this.isAgreed = !this.isAgreed;
-              })
+          // 底部固定区域：协议勾选 + 注销按钮
+          Column() {
+            // 协议勾选栏
+            Row({ space: 6 }) {
+              Circle({ width: 16, height: 16 })
+                .fill(this.isAgreed ? '#10C8A7' : Color.Transparent)
+                .border({ width: 1, color: this.isAgreed ? '#10C8A7' : '#CCCCCC' })
+                .onClick(() => {
+                  this.isAgreed = !this.isAgreed;
+                })
 
-            Row({ space: 2 }) {
-              Text('我已阅读并同意签署').fontSize(12).fontColor('#666666')
-              Text('《用户注销协议》').fontSize(12).fontColor('#10C8A7')
+              Row({ space: 2 }) {
+                Text('我已阅读并同意签署').fontSize(12).fontColor('#666666')
+                Text('《用户注销协议》').fontSize(12).fontColor('#10C8A7')
+              }
             }
+            .width('100%')
+            .justifyContent(FlexAlign.Center)
+            .margin({ bottom: 12 })
+
+            // 注销按钮
+            Button('注销账号')
+              .width('92%')
+              .height(44)
+              .backgroundColor(this.isAgreed ? '#10C8A7' : '#A0E8D7')
+              .fontColor(Color.White)
+              .fontSize(16)
+              .fontWeight(FontWeight.Medium)
+              .borderRadius(22)
+              .onClick(() => {
+                if (!this.isAgreed) {
+                  promptAction.showToast({ message: '请先阅读并勾选用户注销协议' });
+                  return;
+                }
+                this.step = 2; // 进入安全验证
+              })
           }
           .width('100%')
-          .height(50)
-          .justifyContent(FlexAlign.Center)
+          .padding({ top: 16, bottom: 20 })
           .backgroundColor(Color.White)
           .shadow({ radius: 8, color: 'rgba(0,0,0,0.05)', offsetY: -2 })
         }
@@ -144,7 +149,7 @@ struct CloseAccountPage {
               })
           }
           .width('100%')
-          .border({ bottom: { width: 0.5, color: '#EFEFEF' } })
+          .border({ width: { bottom: 0.5 }, color: { bottom: '#EFEFEF' } })
           .margin({ bottom: 40 })
 
           Button('下一步')
@@ -172,10 +177,9 @@ struct CloseAccountPage {
         Column() {
           Blank()
 
-          Circle({ width: 70, height: 70 })
-            .fill(Color.Transparent)
-            .border({ width: 2, color: '#10C8A7' })
-            .overlay('✓', { align: Alignment.Center }) // 模拟大对勾
+          Image($r('app.media.chenggong'))
+            .width(70)
+            .height(70)
             .margin({ bottom: 20 })
 
           Text('账号注销成功')

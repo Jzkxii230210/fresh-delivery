@@ -1,185 +1,175 @@
 import router from '@ohos.router';
 
+// --- 模拟数据模型 ---
+class RefundOrder {
+  orderNo: string = '';
+  refundNo: string = '';
+  status: string = '';
+  time: string = '';
+  productName: string = '';
+  price: string = '';
+  qty: number = 1;
+  refundTotal: string = '';
+  productImage?: Resource;
+}
+
 @Entry
 @Component
-struct RefundApplyPage {
-  // 当前选中的退款原因索引 (-1 表示未选择)
-  @State selectedReasonIndex: number = -1;
-  @State refundDesc: string = '';
-
-  private refundReasons: string[] = [
-    '商品错选/多选',
-    '计划有变，不想要了',
-    '价格太贵了',
-    '收货人信息填写有误',
-    '配送速度太慢',
-    '其他'
+export struct AfterSaleListPage {
+  // 完美复刻原型图的模拟数据
+  private refundList: RefundOrder[] = [
+    {
+      orderNo: '2125538995000052',
+      refundNo: '2300784962519552',
+      status: '退款成功',
+      time: '2099-05-13 14:49:57',
+      productName: '东北五常大米 10kg',
+      price: '68.90',
+      qty: 1,
+      refundTotal: '68.90',
+      productImage: $r('app.media.wuchangdami') // 实际开发请替换为真实大米图片资源
+    }
   ];
 
   build() {
     Column() {
-      // === 1. 顶部标题栏 ===
+      // === 1. 顶部导航栏 ===
       Row() {
-        Image($r('app.media.startIcon'))
-          .width(20).height(20).margin({ right: 12 })
-          .onClick(() => { router.back(); })
+        Image($r('app.media.back')) // 替换为左侧返回箭头 Icon
+          .width(20)
+          .height(20)
+          .onClick(() => {
+            router.back();
+          })
 
-        Text('申请退款')
+        Text('售后退款')
           .fontSize(18)
-          .fontWeight(FontWeight.Bold)
+          .fontWeight(FontWeight.Medium)
           .fontColor('#333333')
           .layoutWeight(1)
           .textAlign(TextAlign.Center)
-
-        Row().width(20) // 平衡右侧
+          .margin({ right: 20 }) // 为了让标题绝对居中，抵消左侧返回图标的宽度
       }
       .width('100%')
       .height(50)
       .padding({ left: 16, right: 16 })
       .backgroundColor(Color.White)
 
-      // === 2. 核心表单滚动区 ===
-      Scroll() {
-        Column() {
-          // --- 顶部退款提示条 ---
-          Row() {
-            Text('退款后订单关闭无法恢复，优惠券、红包不可返还。')
-              .fontSize(12)
-              .fontColor('#999999')
+      // === 2. 售后订单列表区 ===
+      List() {
+        ForEach(this.refundList, (item: RefundOrder) => {
+          ListItem() {
+            this.RefundCard(item)
           }
-          .width('100%')
-          .padding(12)
-          .backgroundColor('#F5F5F5')
-          .borderRadius(6)
-          .margin({ bottom: 16 })
-
-          // --- 订单基本信息 ---
-          Column() {
-            this.InfoRow('订单编号', '2125538995000052')
-            this.InfoRow('退款金额', '￥74.60', true)
-            this.InfoRow('退款方式', '微信支付')
-          }
-          .width('100%')
-          .backgroundColor(Color.White)
-          .borderRadius(12)
-          .padding(16)
-          .margin({ bottom: 12 })
-          .shadow({ radius: 4, color: 'rgba(0,0,0,0.03)', offsetY: 2 })
-
-          // --- 退款原因选择模块 ---
-          Column() {
-            Row() {
-              Text('请选择退款原因 ').fontSize(14).fontWeight(FontWeight.Bold).fontColor('#333333')
-              Text('*').fontSize(14).fontColor('#FF4D4F')
-            }
-            .width('100%')
-            .margin({ bottom: 12 })
-
-            List({ space: 16 }) {
-              ForEach(this.refundReasons, (reason: string, index: number) => {
-                ListItem() {
-                  Row() {
-                    Text(reason)
-                      .fontSize(14)
-                      .fontColor('#333333')
-
-                    Blank()
-
-                    // 单选圆圈
-                    if (this.selectedReasonIndex === index) {
-                      Circle({ width: 18, height: 18 }).fill('#10C8A7')
-                    } else {
-                      Circle({ width: 18, height: 18 }).fill(Color.Transparent)
-                        .border({ width: 1, color: '#CCCCCC' })
-                    }
-                  }
-                  .width('100%')
-                  .onClick(() => {
-                    this.selectedReasonIndex = index;
-                  })
-                }
-              })
-            }
-            .width('100%')
-          }
-          .width('100%')
-          .backgroundColor(Color.White)
-          .borderRadius(12)
-          .padding(16)
-          .margin({ bottom: 12 })
-          .shadow({ radius: 4, color: 'rgba(0,0,0,0.03)', offsetY: 2 })
-
-          // --- 补充说明输入框 ---
-          Column() {
-            Text('补充说明')
-              .fontSize(14)
-              .fontWeight(FontWeight.Bold)
-              .fontColor('#333333')
-              .width('100%')
-              .margin({ bottom: 10 })
-
-            TextArea({ placeholder: '请输入补充说明 (选填)' })
-              .height(90)
-              .backgroundColor('#FAFAFA')
-              .fontSize(13)
-              .placeholderColor('#999999')
-              .borderRadius(8)
-              .padding(10)
-              .onChange((val: string) => {
-                this.refundDesc = val;
-              })
-          }
-          .width('100%')
-          .backgroundColor(Color.White)
-          .borderRadius(12)
-          .padding(16)
-          .margin({ bottom: 40 })
-          .shadow({ radius: 4, color: 'rgba(0,0,0,0.03)', offsetY: 2 })
-        }
-        .width('92%')
-        .padding({ top: 12 })
-      }
-      .scrollBar(BarState.Off)
-      .layoutWeight(1)
-      .backgroundColor('#F8F8F8')
-
-      // === 3. 底部提交按钮 ===
-      Row() {
-        Button('申请退款')
-          .width('100%')
-          .height(44)
-          .backgroundColor('#10C8A7')
-          .fontColor(Color.White)
-          .fontSize(16)
-          .fontWeight(FontWeight.Medium)
-          .borderRadius(22)
-          .onClick(() => {
-            if (this.selectedReasonIndex === -1) {
-              // 可在此处加个轻提示要求选择原因
-              return;
-            }
-            // TODO: 提交退款请求逻辑
-            router.back();
-          })
+        })
       }
       .width('100%')
-      .backgroundColor(Color.White)
-      .padding({ left: 16, right: 16, top: 12, bottom: 12 })
-      .shadow({ radius: 8, color: 'rgba(0,0,0,0.05)', offsetY: -2 })
+      .layoutWeight(1)
+      .scrollBar(BarState.Off)
     }
     .width('100%')
     .height('100%')
-    .backgroundColor('#F8F8F8')
+    .backgroundColor('#F8F8F8') // 整体浅灰色背景
   }
 
-  // --- 辅助 Builder ---
-  @Builder InfoRow(label: string, value: string, isRed: boolean = false) {
-    Row() {
-      Text(label).fontSize(14).fontColor('#666666')
-      Blank()
-      Text(value).fontSize(14).fontColor(isRed ? '#FF4D4F' : '#333333').fontWeight(isRed ? FontWeight.Bold : FontWeight.Normal)
+  // --- 局部复用组件：售后退款卡片 ---
+  @Builder RefundCard(item: RefundOrder) {
+    Column() {
+      // 1. 订单编号与状态行
+      Row() {
+        Text(`订单号: ${item.orderNo}`).fontSize(13).fontColor('#333333')
+        Blank()
+        Text(item.status).fontSize(13).fontColor('#FF8C00') // 醒目的橙色状态
+      }
+      .width('100%')
+      .margin({ bottom: 8 })
+
+      // 2. 退款单号与时间行
+      Row() {
+        Text(`退款单号: ${item.refundNo}`).fontSize(12).fontColor('#999999')
+        Blank()
+        Text(item.time).fontSize(12).fontColor('#999999')
+      }
+      .width('100%')
+      .margin({ bottom: 12 })
+
+      // 分割线
+      Divider().color('#F0F0F0').strokeWidth(0.5)
+
+      // 3. 商品信息区
+      Row() {
+        Image(item.productImage)
+          .width(64)
+          .height(64)
+          .borderRadius(4)
+          .margin({ right: 12 })
+          .backgroundColor('#F5F5F5') // 占位背景色
+
+        Column() {
+          Text(item.productName)
+            .fontSize(14)
+            .fontColor('#333333')
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+            .width('100%')
+            .margin({ top: 2 })
+
+          Blank() // 自动撑开，将价格和数量推到底部
+
+          Row() {
+            Text(`￥${item.price}`).fontSize(14).fontColor('#333333')
+            Blank()
+            Text(`x${item.qty}`).fontSize(13).fontColor('#333333')
+          }
+          .width('100%')
+          .margin({ bottom: 2 })
+        }
+        .height(64) // 与图片等高
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start)
+      }
+      .width('100%')
+      .padding({ top: 16, bottom: 12 })
+
+      // 4. 退款总额明细区
+      Row() {
+        // 红色的“退”字小图标
+        Stack({ alignContent: Alignment.Center }) {
+          Circle({ width: 16, height: 16 }).fill('#FF4D4F')
+          Text('退').fontSize(10).fontColor(Color.White)
+        }
+        .margin({ right: 6 })
+
+        Text(`退款总额 ￥${item.refundTotal}`).fontSize(13).fontColor('#333333')
+      }
+      .width('100%')
+      .margin({ bottom: 16 })
+
+      // 分割线
+      Divider().color('#F0F0F0').strokeWidth(0.5)
+
+      // 5. 底部操作按钮区
+      Row() {
+        Blank()
+        Button('查看详情')
+          .backgroundColor(Color.White)
+          .fontColor('#666666')
+          .fontSize(13)
+          .border({ width: 0.5, color: '#D9D9D9' }) // 浅灰色描边
+          .borderRadius(4) // 小圆角
+          .padding({ left: 12, right: 12, top: 6, bottom: 6 })
+          .height(28)
+          .onClick(() => {
+            router.pushUrl({ url: 'pages/order/RefundDetailPage' });
+          })
+      }
+      .width('100%')
+      .padding({ top: 12 })
     }
-    .width('100%')
-    .margin({ bottom: 12 })
+    .width('92%')
+    .backgroundColor(Color.White)
+    .borderRadius(8)
+    .padding(16)
+    .margin({ top: 12, left: '4%', right: '4%' }) // 居中留白
   }
 }

@@ -26,7 +26,7 @@ struct MessageDetailPage {
     Column() {
       // === 1. 顶部标题栏 ===
       Row() {
-        Image($r('app.media.startIcon'))
+        Image($r('app.media.back'))
           .width(20).height(20).margin({ right: 12 })
           .onClick(() => { router.back(); })
 
@@ -49,10 +49,10 @@ struct MessageDetailPage {
         Column() {
           if (this.notificationType === 'order') {
             // --- 视图A: 订单通知列表 ---
-            this.OrderNotificationItem('2099-05-28 16:52', '订单已完成', '你的订单已配送完成，欢迎再次购买。', '2112476163000231', true)
-            this.OrderNotificationItem('2099-05-28 16:26', '配送员已取货', '你的订单已经开始配送，配送员：张三送，联系电话：13612345678，请耐心等候。', '2112476163000231', false)
-            this.OrderNotificationItem('2099-05-28 16:24', '商品拣货完成', '你的商品已完成拣货，请等待配送。', '2112476163000231', false)
-            this.OrderNotificationItem('2099-05-28 16:10', '商家已接单', '你的订单已被商家接收，请等待拣货。', '2112476163000231', false)
+            this.OrderNotificationItem('2099-05-28 16:52', '订单已完成', '你的订单已配送完成，欢迎再次购买。', '2112476163000231',$r('app.media.more') ,true)
+            this.OrderNotificationItem('2099-05-28 16:26', '配送员已取货', '你的订单已经开始配送，配送员：张三送，联系电话：13612345678，请耐心等候。', '2112476163000231', $r('app.media.more'),false)
+            this.OrderNotificationItem('2099-05-28 16:24', '商品拣货完成', '你的商品已完成拣货，请等待配送。', '2112476163000231', $r('app.media.more') ,false)
+            this.OrderNotificationItem('2099-05-28 16:10', '商家已接单', '你的订单已被商家接收，请等待拣货。', '2112476163000231', $r('app.media.more') ,false)
 
           } else if (this.notificationType === 'system') {
             // --- 视图B: 系统通知列表 ---
@@ -67,12 +67,14 @@ struct MessageDetailPage {
               '2小时前',
               '端午优惠活动，食品类全场八折！',
               '端午大放“粽”，品尝鲜美粽子，弘扬传统文化！',
+              $r('app.media.duanwu'),
               true
             )
             this.ActivityNotificationItem(
               '04-29',
               '主标题主标题，主标题主标题主标题！',
               '副标题副标题 *副标题副标题副标题！*',
+              $r('app.media.shuiguo'),
               false
             )
           }
@@ -90,7 +92,7 @@ struct MessageDetailPage {
   }
 
   // --- 局部复用组件：订单通知卡片 ---
-  @Builder OrderNotificationItem(time: string, title: string, desc: string, orderNo: string, hasRedDot: boolean) {
+  @Builder OrderNotificationItem(time: string, title: string, desc: string, orderNo: string, icon: Resource, hasRedDot: boolean) {
     Column() {
       // 时间戳
       Text(time)
@@ -127,7 +129,7 @@ struct MessageDetailPage {
             .fontSize(12)
             .fontColor('#999999')
           Blank()
-          Image($r('app.media.startIcon')).width(12).height(12)
+          Image(icon).width(12).height(12)
         }
         .width('100%')
       }
@@ -153,7 +155,7 @@ struct MessageDetailPage {
       Column() {
         Row() {
           // 左侧系统蓝底铃铛图标
-          Image($r('app.media.startIcon'))
+          Image($r('app.media.notice'))
             .width(36).height(36)
             .borderRadius(18)
             .margin({ right: 12 })
@@ -194,7 +196,7 @@ struct MessageDetailPage {
   }
 
   // --- 局部复用组件：活动通知卡片 (含图文大图) ---
-  @Builder ActivityNotificationItem(time: string, title: string, desc: string, hasRedDot: boolean) {
+  @Builder ActivityNotificationItem(time: string, title: string, desc: string, bannerImage: Resource, hasRedDot: boolean) {
     Column() {
       Text(time)
         .fontSize(11)
@@ -221,11 +223,14 @@ struct MessageDetailPage {
           .margin({ bottom: 10 })
 
         // 活动图片 Banner
-        Image($r('app.media.startIcon'))
+        Image(bannerImage)
           .width('100%')
           .height(150)
           .borderRadius(8)
           .objectFit(ImageFit.Cover)
+          .onClick(() => {
+            router.pushUrl({ url: 'pages/message/ActivityDetailPage' });
+          })
       }
       .width('92%')
       .backgroundColor(Color.White)

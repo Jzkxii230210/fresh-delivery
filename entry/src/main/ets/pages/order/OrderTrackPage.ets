@@ -1,23 +1,35 @@
 import router from '@ohos.router';
 
+class TrackStep {
+  title: string = '';
+  time: string = '';
+  desc: string = '';
+
+  constructor(title: string, time: string, desc: string) {
+    this.title = title;
+    this.time = time;
+    this.desc = desc;
+  }
+}
+
 @Entry
 @Component
 struct OrderTrackPage {
-  private trackSteps: Array<{ title: string, time: string, desc: string }> = [
-    { title: '订单已完成', time: '2099-05-12 12:05', desc: '感谢你使用小默买菜' },
-    { title: '配送中', time: '2099-05-12 12:05', desc: '配送员已取货开始为你配送，配送员：欧**' },
-    { title: '配送员已到店', time: '2099-05-12 13:50', desc: '配送员已到店，配送员：欧**' },
-    { title: '配送员已接单', time: '2099-05-12 13:45', desc: '配送员正在前往商家，配送员：欧**' },
-    { title: '拣货完成', time: '2099-05-12 12:05', desc: '商家已完成拣货，等待配送' },
-    { title: '商家已接单', time: '2099-05-12 13:50', desc: '商品准备中，预计 2099-05-12 14:20 前拣货完成' },
-    { title: '已支付', time: '2099-05-12 13:45', desc: '订单支付成功，预订送达时间：14:20-15:20' }
+  private trackSteps: TrackStep[] = [
+    new TrackStep('订单已完成', '2099-05-12 12:05', '感谢你使用小默买菜'),
+    new TrackStep('配送中', '2099-05-12 12:05', '配送员已取货开始为你配送，配送员：欧**'),
+    new TrackStep('配送员已到店', '2099-05-12 13:50', '配送员已到店，配送员：欧**'),
+    new TrackStep('配送员已接单', '2099-05-12 13:45', '配送员正在前往商家，配送员：欧**'),
+    new TrackStep('拣货完成', '2099-05-12 12:05', '商家已完成拣货，等待配送'),
+    new TrackStep('商家已接单', '2099-05-12 13:50', '商品准备中，预计 2099-05-12 14:20 前拣货完成'),
+    new TrackStep('已支付', '2099-05-12 13:45', '订单支付成功，预订送达时间：14:20-15:20')
   ];
 
   build() {
     Column() {
       // 顶部导航栏
       Row() {
-        Image($r('app.media.startIcon'))
+        Image($r('app.media.back'))
           .width(20).height(20).margin({ right: 12 })
           .onClick(() => { router.back(); })
 
@@ -39,7 +51,7 @@ struct OrderTrackPage {
       Scroll() {
         Column() {
           List() {
-            ForEach(this.trackSteps, (step, index) => {
+            ForEach(this.trackSteps, (step: TrackStep, index: number) => {
               ListItem() {
                 Row() {
                   // 左侧时间轴图标与竖线

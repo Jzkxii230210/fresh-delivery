@@ -16,7 +16,7 @@ struct PrivacyManagementPage {
     Column() {
       // === 1. 顶部标题栏 ===
       Row() {
-        Image($r('app.media.startIcon'))
+        Image($r('app.media.back'))
           .width(20).height(20).margin({ right: 12 })
           .onClick(() => { router.back(); })
 
@@ -38,7 +38,7 @@ struct PrivacyManagementPage {
       Scroll() {
         Column() {
           List() {
-            ForEach(this.privacyItems, (title, index) => {
+            ForEach(this.privacyItems, (title: string, index: number) => {
               ListItem() {
                 Row() {
                   Text(title)
@@ -47,7 +47,7 @@ struct PrivacyManagementPage {
 
                   Blank()
 
-                  Image($r('app.media.startIcon'))
+                  Image($r('app.media.more'))
                     .width(12)
                     .height(12)
                 }

@@ -5,6 +5,15 @@ import promptAction from '@ohos.promptAction';
 @Component
 struct LoginPage {
   @State isAgreed: boolean = false;
+  // 从路由参数获取来源Tab索引
+  private fromTabIndex: number = 0;
+
+  aboutToAppear() {
+    const params = router.getParams() as Record<string, Object>;
+    if (params && params['tabIndex'] !== undefined) {
+      this.fromTabIndex = Number(params['tabIndex']);
+    }
+  }
 
   build() {
     Stack({ alignContent: Alignment.Top }) {
@@ -13,9 +22,11 @@ struct LoginPage {
       Column() {
         Row() {
           // 左上角关闭按钮
-          Image($r('app.media.startIcon'))
+          Image($r('app.media.back'))
             .width(20).height(20)
-            .onClick(() => { router.back(); })
+            .onClick(() => {
+              router.back();
+            })
 
           Blank()
 
@@ -24,8 +35,7 @@ struct LoginPage {
             .fontSize(14)
             .fontColor('#333333')
             .onClick(() => {
-              // 游客模式进入主页
-              router.replaceUrl({ url: 'pages/main/MainPage' });
+              router.back();
             })
         }
         .width('100%')
@@ -37,17 +47,28 @@ struct LoginPage {
         direction: GradientDirection.Bottom,
         colors: [['#85E3B8', 0.0], ['#52C48A', 1.0]]
       })
+      .zIndex(1)
+
+      // === 绿色背景中间的 Logo 图片 ===
+      Image($r('app.media.logo'))
+        .width(80)
+        .height(80)
+        .borderRadius(40)
+        .position({ x: '50%', y: 120 })
+        .translate({ x: '-50%', y: '-50%' })
+        .shadow({ radius: 12, color: 'rgba(0,0,0,0.15)', offsetY: 4 })
+        .zIndex(2)
 
       // === 2. 核心内容表单卡片区 ===
       Column() {
         // 品牌 Logo 与名称
-        Image($r('app.media.startIcon'))
+        Image($r('app.media.logo'))
           .width(72).height(72)
           .borderRadius(36)
           .margin({ top: 120, bottom: 12 })
           .shadow({ radius: 8, color: 'rgba(0,0,0,0.08)', offsetY: 4 })
 
-        Text('小默买菜')
+        Text('小毕买菜')
           .fontSize(18)
           .fontWeight(FontWeight.Bold)
           .fontColor('#333333')
@@ -76,8 +97,11 @@ struct LoginPage {
               promptAction.showToast({ message: '请先阅读并勾选服务协议与隐私政策' });
               return;
             }
-            // 登录成功，跳转到主页
-            router.replaceUrl({ url: 'pages/main/MainPage' });
+            // 登录成功，跳转到主页（保持来源Tab）
+            router.replaceUrl({ 
+              url: 'pages/main/MainPage',
+              params: { tabIndex: this.fromTabIndex }
+            });
           })
 
         // 其他登录方式分隔文案
@@ -89,24 +113,24 @@ struct LoginPage {
         // 第三方/其他登录方式图标行 (手机号验证码、QQ/微信/Apple)
         Row({ space: 32 }) {
           // 验证码登录入口
-          Image($r('app.media.startIcon'))
+          Image($r('app.media.shouji'))
             .width(36).height(36)
             .onClick(() => {
               router.pushUrl({ url: 'pages/login/SmsLoginPage' });
             })
 
-          // 微信登录
-          Image($r('app.media.startIcon'))
+          // qq登录入口
+          Image($r('app.media.qqdl'))
             .width(36).height(36)
             .onClick(() => {
-              router.pushUrl({ url: 'pages/login/ThirdPartyAuthPage' });
+              router.pushUrl({ url: 'pages/login/QQAuthPage' });
             })
 
-          // Apple 登录
-          Image($r('app.media.startIcon'))
+          // 微信登录
+          Image($r('app.media.weixinzhifu'))
             .width(36).height(36)
             .onClick(() => {
-              router.pushUrl({ url: 'pages/login/ThirdPartyAuthPage' });
+              router.pushUrl({ url: 'pages/login/WechatAuthPage' });
             })
         }
         .margin({ bottom: 40 })
@@ -136,5 +160,11 @@ struct LoginPage {
     .width('100%')
     .height('100%')
     .backgroundColor('#F8F8F8')
+  }
+
+  // 页面转场动画 - 退场时向右滑出（返回效果）
+  pageTransition() {
+    PageTransitionExit({ duration: 200, curve: Curve.EaseOut })
+      .slide(SlideEffect.Right)
   }
 }

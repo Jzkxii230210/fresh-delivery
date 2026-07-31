@@ -7,12 +7,21 @@ struct PhoneCodeLoginPage {
   @State phoneNum: string = '';
   @State smsCode: string = '';
   @State isAgreed: boolean = false;
+  // 从路由参数获取来源Tab索引
+  private fromTabIndex: number = 0;
+
+  aboutToAppear() {
+    const params = router.getParams() as Record<string, Object>;
+    if (params && params['tabIndex'] !== undefined) {
+      this.fromTabIndex = Number(params['tabIndex']);
+    }
+  }
 
   build() {
     Column() {
       // === 1. 顶部标题栏 ===
       Row() {
-        Image($r('app.media.startIcon'))
+        Image($r('app.media.back'))
           .width(20).height(20)
           .onClick(() => { router.back(); })
 
@@ -54,7 +63,7 @@ struct PhoneCodeLoginPage {
           }
           .margin({ right: 16 })
           .padding({ right: 16 })
-          .border({ right: { width: 0.5, color: '#EFEFEF' } })
+          .border({ width: { right: 0.5 }, color: '#EFEFEF' })
 
           TextInput({ text: this.phoneNum, placeholder: '请输入手机号' })
             .layoutWeight(1)
@@ -65,7 +74,7 @@ struct PhoneCodeLoginPage {
             .onChange((val) => { this.phoneNum = val; })
         }
         .width('100%')
-        .border({ bottom: { width: 0.5, color: '#EFEFEF' } })
+        .border({ width: { bottom: 0.5 }, color: '#EFEFEF' })
         .margin({ bottom: 20 })
 
         // 验证码输入行
@@ -89,11 +98,11 @@ struct PhoneCodeLoginPage {
             })
         }
         .width('100%')
-        .border({ bottom: { width: 0.5, color: '#EFEFEF' } })
+        .border({ width: { bottom: 0.5 }, color: '#EFEFEF' })
         .margin({ bottom: 40 })
 
         // 登录按钮
-        Button('登录')
+        Button('立即登录')
           .width('100%')
           .height(46)
           .backgroundColor('#10C8A7')
@@ -112,6 +121,11 @@ struct PhoneCodeLoginPage {
               return;
             }
             promptAction.showToast({ message: '登录成功' });
+            // 登录成功，跳转到主页首页
+            router.replaceUrl({ 
+              url: 'pages/main/MainPage',
+              params: { tabIndex: 0 }
+            });
           })
 
         // 其他登录方式
@@ -121,9 +135,9 @@ struct PhoneCodeLoginPage {
           .margin({ bottom: 20 })
 
         Row({ space: 32 }) {
-          Image($r('app.media.startIcon')).width(36).height(36)
-          Image($r('app.media.startIcon')).width(36).height(36)
-          Image($r('app.media.startIcon')).width(36).height(36)
+          Image($r('app.media.qqdl')).width(36).height(36)
+          Image($r('app.media.weixinzhifu')).width(36).height(36)
+
         }
         .margin({ bottom: 30 })
 

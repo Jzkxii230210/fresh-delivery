@@ -1,10 +1,53 @@
 import router from '@ohos.router';
 
+// 商品数据接口
+interface Product {
+  image: Resource;
+  name: string;
+  description: string;
+  currentPrice: string;
+  originalPrice: string;
+  productIndex: number; // 对应RECOMMEND_PRODUCTS中的索引
+}
+
 @Entry
 @Component
 struct PaymentSuccessPage {
-  // 模拟推荐商品数据
-  private recommendList: number[] = [1, 2, 3, 4];
+  // 推荐商品数据
+  private recommendProducts: Product[] = [
+    {
+      image: $r('app.media.huacai'),
+      name: '花菜 约500g',
+      description: '产地直供，营养丰富，多',
+      currentPrice: '¥7.99',
+      originalPrice: '¥9.90',
+      productIndex: 0 // 花菜
+    },
+    {
+      image: $r('app.media.baicai'),
+      name: '大白菜 约500g',
+      description: '新鲜采摘，口感清甜',
+      currentPrice: '¥3.99',
+      originalPrice: '¥5.90',
+      productIndex: 3 // 大白菜
+    },
+    {
+      image: $r('app.media.jidan'),
+      name: '土鸡蛋 30枚',
+      description: '农家散养，营养健康',
+      currentPrice: '¥18.99',
+      originalPrice: '¥25.90',
+      productIndex: 2 // 本地鸡蛋
+    },
+    {
+      image: $r('app.media.wuchangdami'),
+      name: '五常大米 5kg',
+      description: '东北黑土地，香糯可口',
+      currentPrice: '¥39.99',
+      originalPrice: '¥49.90',
+      productIndex: 0 // 没有对应商品，默认跳转到第一个商品
+    }
+  ];
 
   build() {
     Scroll() {
@@ -12,7 +55,10 @@ struct PaymentSuccessPage {
         // === 1. 顶部支付成功状态区 ===
         Column() {
           Row({ space: 8 }) {
-            Circle({ width: 24, height: 24 }).fill('#10C8A7')
+            Stack() {
+              Circle({ width: 24, height: 24 }).fill('#10C8A7')
+              Image($r('app.media.select')).width(12).height(12)
+            }
             Text('支付成功')
               .fontSize(20)
               .fontWeight(FontWeight.Bold)
@@ -31,7 +77,8 @@ struct PaymentSuccessPage {
               .fontSize(14)
               .borderRadius(18)
               .onClick(() => {
-                // router.clear(); // 清空路由栈返回首页
+                // 返回首页
+                router.replaceUrl({ url: 'pages/main/MainPage' });
               })
 
             Button('查看订单')
@@ -54,9 +101,9 @@ struct PaymentSuccessPage {
 
         // === 2. 更多精选商品标题 ===
         Row() {
-          Image($r('app.media.startIcon')).width(14).height(14).margin({ right: 6 })
+          Image($r('app.media.xihuan')).width(14).height(14).margin({ right: 6 })
           Text('更多精选商品').fontSize(14).fontColor('#FF4D4F')
-          Image($r('app.media.startIcon')).width(14).height(14).margin({ left: 6 })
+          Image($r('app.media.xihuan')).width(14).height(14).margin({ left: 6 })
         }
         .width('100%')
         .justifyContent(FlexAlign.Center)
@@ -64,9 +111,9 @@ struct PaymentSuccessPage {
 
         // === 3. 商品瀑布流推荐 (双列 Grid) ===
         Grid() {
-          ForEach(this.recommendList, () => {
+          ForEach(this.recommendProducts, (product: Product) => {
             GridItem() {
-              this.ProductCard()
+              this.ProductCard(product)
             }
           })
         }
@@ -85,21 +132,21 @@ struct PaymentSuccessPage {
   }
 
   // --- 局部复用组件：推荐商品卡片 ---
-  @Builder ProductCard() {
+  @Builder ProductCard(product: Product) {
     Column() {
-      Image($r('app.media.startIcon'))
+      Image(product.image)
         .width('100%')
         .aspectRatio(1)
         .borderRadius({ topLeft: 8, topRight: 8 })
 
       Column() {
-        Text('花菜 约500g')
+        Text(product.name)
           .fontSize(14)
           .fontColor('#333333')
           .fontWeight(FontWeight.Medium)
           .margin({ bottom: 4 })
 
-        Text('产地直供，营养丰富，多...')
+        Text(product.description)
           .fontSize(11)
           .fontColor('#999999')
           .margin({ bottom: 10 })
@@ -107,14 +154,14 @@ struct PaymentSuccessPage {
           .textOverflow({ overflow: TextOverflow.Ellipsis })
 
         Row() {
-          Text('¥7.99').fontSize(16).fontColor('#FF4D4F').fontWeight(FontWeight.Bold).margin({ right: 4 })
-          Text('¥9.90').fontSize(12).fontColor('#999999').decoration({ type: TextDecorationType.LineThrough })
+          Text(product.currentPrice).fontSize(16).fontColor('#FF4D4F').fontWeight(FontWeight.Bold).margin({ right: 4 })
+          Text(product.originalPrice).fontSize(12).fontColor('#999999').decoration({ type: TextDecorationType.LineThrough })
 
           Blank()
 
           Stack({ alignContent: Alignment.Center }) {
             Circle({ width: 22, height: 22 }).fill('#10C8A7')
-            Image($r('app.media.startIcon')).width(12).height(12)
+            Image($r('app.media.gouwuche')).width(12).height(12)
           }
         }
         .width('100%')
@@ -125,5 +172,12 @@ struct PaymentSuccessPage {
     }
     .backgroundColor(Color.White)
     .borderRadius(8)
+    .onClick(() => {
+      // 跳转到商品详情页面
+      router.pushUrl({
+        url: 'pages/store/ProductDetailPage',
+        params: { productIndex: product.productIndex }
+      });
+    })
   }
 }

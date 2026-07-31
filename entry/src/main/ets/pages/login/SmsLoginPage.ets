@@ -11,12 +11,21 @@ struct SmsLoginPage {
   @State verifyCode: string = '';
   @State countdown: number = 0;
   @State isAgreed: boolean = false;
+  // 从路由参数获取来源Tab索引
+  private fromTabIndex: number = 0;
+
+  aboutToAppear() {
+    const params = router.getParams() as Record<string, Object>;
+    if (params && params['tabIndex'] !== undefined) {
+      this.fromTabIndex = Number(params['tabIndex']);
+    }
+  }
 
   build() {
     Column() {
       // 顶部导航栏
       Row() {
-        Image($r('app.media.startIcon'))
+        Image($r('app.media.back'))
           .width(20)
           .height(20)
           .onClick(() => {
@@ -112,7 +121,7 @@ struct SmsLoginPage {
 
       // 用户协议
       Row() {
-        Checkbox()
+        Checkbox({ name: 'checkbox', group: 'checkboxGroup' })
           .select(this.isAgreed)
           .selectedColor('#10C8A7')
           .onChange((isChecked: boolean) => {
@@ -141,19 +150,33 @@ struct SmsLoginPage {
       .margin({ top: 16 })
 
       // 登录按钮
-      Button('登录')
+      Button('立即登录')
         .width('92%')
         .height(44)
-        .backgroundColor(this.isAgreed && this.phoneNumber.length === 11 && this.verifyCode.length >= 4 ? '#10C8A7' : '#CCCCCC')
+        .backgroundColor('#10C8A7')
         .fontColor(Color.White)
         .fontSize(15)
         .fontWeight(FontWeight.Medium)
         .borderRadius(22)
         .margin({ top: 32 })
-        .enabled(this.isAgreed && this.phoneNumber.length === 11 && this.verifyCode.length >= 4)
         .onClick(() => {
-          // 登录成功，跳转到主页
-          router.replaceUrl({ url: 'pages/main/MainPage' });
+          if (!this.isAgreed) {
+            promptAction.showToast({ message: '请先勾选用户协议与隐私政策' });
+            return;
+          }
+          if (this.phoneNumber.length !== 11) {
+            promptAction.showToast({ message: '请输入正确的手机号' });
+            return;
+          }
+          if (this.verifyCode.length < 4) {
+            promptAction.showToast({ message: '请输入验证码' });
+            return;
+          }
+          // 登录成功，跳转到主页首页
+          router.replaceUrl({ 
+            url: 'pages/main/MainPage',
+            params: { tabIndex: 0 }
+          });
         })
 
       // 其他登录方式
@@ -165,19 +188,19 @@ struct SmsLoginPage {
 
         Row({ space: 32 }) {
           // 微信登录
-          Image($r('app.media.startIcon'))
+          Image($r('app.media.weixinzhifu'))
             .width(36)
             .height(36)
             .onClick(() => {
-              router.pushUrl({ url: 'pages/login/ThirdPartyAuthPage' });
+              router.pushUrl({ url: 'pages/login/WechatAuthPage' });
             })
 
           // QQ登录
-          Image($r('app.media.startIcon'))
+          Image($r('app.media.qqdl'))
             .width(36)
             .height(36)
             .onClick(() => {
-              router.pushUrl({ url: 'pages/login/ThirdPartyAuthPage' });
+              router.pushUrl({ url: 'pages/login/QQAuthPage' });
             })
         }
       }

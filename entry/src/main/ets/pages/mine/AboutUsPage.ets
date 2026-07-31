@@ -8,7 +8,7 @@ struct AboutUsPage {
     Column() {
       // === 1. 顶部标题栏 ===
       Row() {
-        Image($r('app.media.startIcon'))
+        Image($r('app.media.back'))
           .width(20).height(20).margin({ right: 12 })
           .onClick(() => { router.back(); })
 
@@ -32,13 +32,13 @@ struct AboutUsPage {
           // --- 品牌 Logo 与版本号区域 ---
           Column() {
             // App Logo 占位
-            Image($r('app.media.startIcon'))
+            Image($r('app.media.logo'))
               .width(80)
               .height(80)
               .borderRadius(16)
               .margin({ bottom: 12 })
 
-            Text('小默买菜')
+            Text('小毕买菜')
               .fontSize(18)
               .fontWeight(FontWeight.Bold)
               .fontColor('#333333')
@@ -58,7 +58,7 @@ struct AboutUsPage {
             Row() {
               Text('给我们评分').fontSize(14).fontColor('#333333')
               Blank()
-              Image($r('app.media.startIcon')).width(12).height(12)
+              Image($r('app.media.more')).width(12).height(12)
             }
             .width('100%')
             .padding(16)
@@ -72,7 +72,7 @@ struct AboutUsPage {
             Row() {
               Text('分享给好友').fontSize(14).fontColor('#333333')
               Blank()
-              Image($r('app.media.startIcon')).width(12).height(12)
+              Image($r('app.media.more')).width(12).height(12)
             }
             .width('100%')
             .padding(16)
@@ -87,7 +87,7 @@ struct AboutUsPage {
               Text('版本更新').fontSize(14).fontColor('#333333')
               Blank()
               Text('已是最新版本').fontSize(13).fontColor('#999999').margin({ right: 6 })
-              Image($r('app.media.startIcon')).width(12).height(12)
+              Image($r('app.media.more')).width(12).height(12)
             }
             .width('100%')
             .padding(16)

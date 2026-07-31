@@ -79,7 +79,7 @@ struct ChangePhonePage {
                 })
             }
             .width('100%')
-            .border({ bottom: { width: 0.5, color: '#EFEFEF' } })
+            .border({ width: { bottom: 0.5 }, color: '#EFEFEF' })
             .margin({ bottom: 40 })
 
             // 下一步按钮
@@ -120,7 +120,7 @@ struct ChangePhonePage {
               }
               .margin({ right: 16 })
               .padding({ right: 16 })
-              .border({ right: { width: 0.5, color: '#EFEFEF' } })
+              .border({ width: { right: 0.5 }, color: '#EFEFEF' })
 
               TextInput({ text: this.newPhoneNum, placeholder: '请输入手机号' })
                 .layoutWeight(1)
@@ -131,7 +131,7 @@ struct ChangePhonePage {
                 .onChange((val) => { this.newPhoneNum = val; })
             }
             .width('100%')
-            .border({ bottom: { width: 0.5, color: '#EFEFEF' } })
+            .border({ width: { bottom: 0.5 }, color: '#EFEFEF' })
             .margin({ bottom: 16 })
 
             // 新验证码输入行
@@ -155,7 +155,7 @@ struct ChangePhonePage {
                 })
             }
             .width('100%')
-            .border({ bottom: { width: 0.5, color: '#EFEFEF' } })
+            .border({ width: { bottom: 0.5 }, color: '#EFEFEF' })
             .margin({ bottom: 40 })
 
             // 确定按钮

@@ -1,16 +1,51 @@
 import router from '@ohos.router';
+import { ORDERS, OrderData, OrderProduct, NEARBY_SHOPS } from '../../common/HomeData';
+import { CancelOrderDialog } from '../../views/components/CancelOrderDialog';
 
 @Entry
 @Component
 struct OrderDetailPage {
-  // 模拟订单状态类型: 'wait' | 'finished' | 'closed' | 'refund'
-  @State orderStatus: string = 'wait';
+  // 订单ID参数
+  @State orderId: string = '';
+  // 当前订单数据
+  @State order: OrderData = ORDERS[0];
+
+  // 根据商家名称查找商家索引
+  private findShopIndex(storeName: string): number {
+    const index = NEARBY_SHOPS.findIndex(shop => shop.name === storeName);
+    return index >= 0 ? index : 0; // 如果找不到，默认返回第一个商家
+  }
+
+  // 取消订单弹窗控制器
+  private cancelDialogController: CustomDialogController = new CustomDialogController({
+    builder: CancelOrderDialog({
+      onConfirm: () => {
+        // TODO: 执行取消订单逻辑
+        console.info('订单已取消');
+      }
+    }),
+    customStyle: true,
+    alignment: DialogAlignment.Center
+  });
+
+  aboutToAppear() {
+    // 获取路由传递的订单ID参数
+    const params = router.getParams() as Record<string, Object>;
+    if (params && params['orderId']) {
+      this.orderId = params['orderId'] as string;
+      // 根据订单ID查找对应的订单数据
+      const foundOrder = ORDERS.find((item: OrderData) => item.id === this.orderId);
+      if (foundOrder) {
+        this.order = foundOrder;
+      }
+    }
+  }
 
   build() {
     Column() {
       // === 1. 顶部绿色导航栏 ===
       Row() {
-        Image($r('app.media.startIcon'))
+        Image($r('app.media.back'))
           .width(20).height(20).margin({ right: 12 })
           .onClick(() => { router.back(); })
 
@@ -21,7 +56,7 @@ struct OrderDetailPage {
           .layoutWeight(1)
           .textAlign(TextAlign.Center)
 
-        Image($r('app.media.startIcon')).width(20).height(20) // 右上角分享/扩展图标
+        Image($r('app.media.fenxiang')).width(20).height(20) // 右上角分享/扩展图标
       }
       .width('100%')
       .height(50)
@@ -31,19 +66,15 @@ struct OrderDetailPage {
       // === 2. 滚动详情区 ===
       Scroll() {
         Column() {
-          // --- 顶部状态提示卡片 (根据 orderStatus 动态渲染) ---
+          // --- 顶部状态提示卡片 (根据 order.statusType 动态渲染) ---
           Column() {
             Row() {
               Text(this.getStatusTitle())
                 .fontSize(18)
                 .fontWeight(FontWeight.Bold)
                 .fontColor('#333333')
-
-              // 点击状态可跳转到订单跟踪页
-              Image($r('app.media.startIcon')).width(14).height(14).margin({ left: 4 })
                 .onClick(() => {
-                  // TODO: 订单跟踪页待实现
-                  // router.pushUrl({ url: 'pages/order/OrderTrackPage' });
+                  router.pushUrl({ url: 'pages/order/OrderTrackPage', params: { orderId: this.order.id } });
                 })
             }
             .margin({ bottom: 8 })
@@ -55,29 +86,61 @@ struct OrderDetailPage {
 
             // 动态按钮组
             Row({ space: 12 }) {
-              if (this.orderStatus === 'wait') {
+              if (this.order.statusType === 'wait') {
                 Button('取消订单')
                   .width(100).height(34).backgroundColor(Color.White).fontColor('#10C8A7')
                   .border({ width: 1, color: '#10C8A7' }).fontSize(13).borderRadius(17)
+                  .onClick(() => {
+                    // 显示取消订单弹窗
+                    this.cancelDialogController.open();
+                  })
                 Button('联系客服')
                   .width(100).height(34).backgroundColor(Color.White).fontColor('#666666')
                   .border({ width: 1, color: '#CCCCCC' }).fontSize(13).borderRadius(17)
-              } else if (this.orderStatus === 'finished' || this.orderStatus === 'closed') {
+                  .onClick(() => {
+                    router.pushUrl({ url: 'pages/mine/HelpCenterPage' });
+                  })
+              } else if (this.order.statusType === 'finished' || this.order.statusType === 'closed') {
                 Button('再次购买')
                   .width(100).height(34).backgroundColor('#10C8A7').fontColor(Color.White)
                   .fontSize(13).borderRadius(17)
+                  .onClick(() => {
+                    // 根据商家名称找到对应的商家索引，跳转到商家详情页
+                    const shopIndex = this.findShopIndex(this.order.storeName);
+                    router.pushUrl({ 
+                      url: 'pages/store/StoreHomePage',
+                      params: { shopIndex: shopIndex }
+                    });
+                  })
                 Button('联系客服')
                   .width(100).height(34).backgroundColor(Color.White).fontColor('#666666')
                   .border({ width: 1, color: '#CCCCCC' }).fontSize(13).borderRadius(17)
-              } else if (this.orderStatus === 'refund') {
+                  .onClick(() => {
+                    router.pushUrl({ url: 'pages/mine/HelpCenterPage' });
+                  })
+              } else if (this.order.statusType === 'refund') {
+                // 退款订单只显示两个按钮：查看退款和再次购买
+                Button('查看退款')
+                  .width(100).height(34).backgroundColor(Color.White).fontColor('#666666')
+                  .border({ width: 1, color: '#CCCCCC' }).fontSize(13).borderRadius(17)
+                  .onClick(() => {
+                    // 跳转到退款详情页
+                    router.pushUrl({ 
+                      url: 'pages/order/RefundDetailPage',
+                      params: { orderId: this.order.id }
+                    });
+                  })
                 Button('再次购买')
-                  .width(90).height(34).backgroundColor('#10C8A7').fontColor(Color.White).fontSize(12).borderRadius(17)
-                Button('退款详情')
-                  .width(90).height(34).backgroundColor(Color.White).fontColor('#666666')
-                  .border({ width: 1, color: '#CCCCCC' }).fontSize(12).borderRadius(17)
-                Button('联系客服')
-                  .width(90).height(34).backgroundColor(Color.White).fontColor('#666666')
-                  .border({ width: 1, color: '#CCCCCC' }).fontSize(12).borderRadius(17)
+                  .width(100).height(34).backgroundColor('#10C8A7').fontColor(Color.White)
+                  .fontSize(13).borderRadius(17)
+                  .onClick(() => {
+                    // 根据商家名称找到对应的商家索引，跳转到商家详情页
+                    const shopIndex = this.findShopIndex(this.order.storeName);
+                    router.pushUrl({ 
+                      url: 'pages/store/StoreHomePage',
+                      params: { shopIndex: shopIndex }
+                    });
+                  })
               }
             }
           }
@@ -88,7 +151,7 @@ struct OrderDetailPage {
           .margin({ top: 12, bottom: 12 })
 
           // --- 骑手配送信息卡片 (仅在已完成/配送时显示) ---
-          if (this.orderStatus === 'finished') {
+          if (this.order.statusType === 'finished') {
             Row() {
               Image($r('app.media.startIcon')).width(40).height(40).borderRadius(20).margin({ right: 12 })
               Column() {
@@ -115,17 +178,28 @@ struct OrderDetailPage {
           // --- 商品清单与费用明细卡片 ---
           Column() {
             Row() {
-              Image($r('app.media.startIcon')).width(16).height(16).borderRadius(2).margin({ right: 6 })
-              Text('天虹商场-凤凰城店').fontSize(14).fontWeight(FontWeight.Bold).fontColor('#333333')
-              Image($r('app.media.startIcon')).width(12).height(12).margin({ left: 2 })
+              Image(this.order.storeIcon).width(16).height(16).borderRadius(2).margin({ right: 6 })
+              Text(this.order.storeName).fontSize(14).fontWeight(FontWeight.Bold).fontColor('#333333')
             }
             .width('100%')
             .margin({ bottom: 12 })
 
-            // 商品1
-            this.ProductItem('东北五常大米 10kg', '￥68.90', '1', '￥68.90')
-            // 商品2
-            this.ProductItem('本地鸡蛋8枚 约500g/份', '￥6.50', '1', '￥6.50')
+            // 商品列表
+            ForEach(this.order.products, (product: OrderProduct) => {
+              this.ProductItem(product)
+            })
+
+            // 退款到账提示（仅退款订单显示）
+            if (this.order.statusType === 'refund') {
+              Row() {
+                Text('退款到账')
+                  .fontSize(14)
+                  .fontColor('#FFA500')
+                  .fontWeight(FontWeight.Medium)
+              }
+              .width('100%')
+              .margin({ top: 8, bottom: 8 })
+            }
 
             Divider().color('#F0F0F0').strokeWidth(0.5).margin({ top: 8, bottom: 12 })
 
@@ -143,7 +217,7 @@ struct OrderDetailPage {
               Text('共节省 ¥8').fontSize(12).fontColor('#FF4D4F')
               Blank()
               Text('实付金额：').fontSize(13).fontColor('#333333')
-              Text('￥ 74.6').fontSize(18).fontColor('#FF4D4F').fontWeight(FontWeight.Bold)
+              Text('￥ ' + this.order.totalPrice).fontSize(18).fontColor('#FF4D4F').fontWeight(FontWeight.Bold)
             }
             .width('100%')
             .margin({ bottom: 12 })
@@ -151,7 +225,7 @@ struct OrderDetailPage {
             Divider().color('#F0F0F0').strokeWidth(0.5).margin({ bottom: 12 })
 
             Row() {
-              Image($r('app.media.startIcon')).width(16).height(16).margin({ right: 6 })
+              Image($r('app.media.lianxi')).width(16).height(16).margin({ right: 6 })
               Text('联系商家').fontSize(13).fontColor('#333333')
             }
             .width('100%')
@@ -173,8 +247,8 @@ struct OrderDetailPage {
             Divider().color('#F0F0F0').strokeWidth(0.5).margin({ top: 8, bottom: 12 })
 
             this.InfoBlockTitle('订单信息')
-            this.InfoRow('订单号码：', '2125538995000052')
-            this.InfoRow('下单时间：', '2099-05-12 13:45:50')
+            this.InfoRow('订单号码：', this.order.id)
+            this.InfoRow('下单时间：', this.order.createTime)
             this.InfoRow('支付方式：', '微信支付')
             this.InfoRow('订单备注：', '其他商品继续配送（缺货商品退款）')
           }
@@ -196,30 +270,30 @@ struct OrderDetailPage {
 
   // --- 辅助 Builder ---
   getStatusTitle(): string {
-    if (this.orderStatus === 'wait') return '待商家接单 >';
-    if (this.orderStatus === 'finished') return '订单已完成 >';
-    if (this.orderStatus === 'closed') return '订单已关闭 >';
-    return '退款已到账 >';
+    if (this.order.statusType === 'wait') return this.order.status + ' >';
+    if (this.order.statusType === 'finished') return '订单已完成 >';
+    if (this.order.statusType === 'closed') return '订单已关闭 >';
+    return '订单已关闭 >'; // 退款订单也显示"订单已关闭"
   }
 
   getStatusDesc(): string {
-    if (this.orderStatus === 'wait') return '订单已付款，请耐心等待商家接单';
-    if (this.orderStatus === 'finished') return '感谢你使用小默买菜';
-    if (this.orderStatus === 'closed') return '期待你再次使用小默买菜';
-    return '你的退款74.6元已退回到你的支付账户，请查收';
+    if (this.order.statusType === 'wait') return '订单已付款，请耐心等待商家接单';
+    if (this.order.statusType === 'finished') return '感谢你使用小默买菜';
+    if (this.order.statusType === 'closed') return '期待你再次使用小默买菜';
+    return '期待你再次使用小默买菜'; // 退款订单也显示相同描述
   }
 
-  @Builder ProductItem(name: string, price: string, count: string, total: string) {
+  @Builder ProductItem(product: OrderProduct) {
     Row() {
-      Image($r('app.media.startIcon')).width(50).height(50).borderRadius(6).margin({ right: 10 })
+      Image(product.image).width(50).height(50).borderRadius(6).margin({ right: 10 })
       Column() {
-        Text(name).fontSize(13).fontColor('#333333').fontWeight(FontWeight.Medium).margin({ bottom: 4 })
-        Text(`${price}  x${count}`).fontSize(12).fontColor('#666666')
+        Text(product.name).fontSize(13).fontColor('#333333').fontWeight(FontWeight.Medium).margin({ bottom: 4 })
+        Text(`￥${product.price}  x${product.quantity}`).fontSize(12).fontColor('#666666')
       }
       .layoutWeight(1)
       .alignItems(HorizontalAlign.Start)
 
-      Text(total).fontSize(13).fontColor('#333333').fontWeight(FontWeight.Medium)
+      Text('￥' + (parseFloat(product.price) * product.quantity).toFixed(2)).fontSize(13).fontColor('#333333').fontWeight(FontWeight.Medium)
     }
     .width('100%')
     .margin({ bottom: 10 })

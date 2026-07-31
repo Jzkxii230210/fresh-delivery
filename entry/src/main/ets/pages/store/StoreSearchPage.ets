@@ -17,7 +17,7 @@ struct StoreSearchPage {
     Column() {
       // === 1. 顶部搜索导航栏 ===
       Row() {
-        Image($r('app.media.startIcon')) // 返回按钮
+        Image($r('app.media.back')) // 返回按钮
           .width(20)
           .height(20)
           .margin({ right: 12 })
@@ -31,7 +31,7 @@ struct StoreSearchPage {
 
         // 搜索输入框
         Row() {
-          Image($r('app.media.startIcon')).width(16).height(16).margin({ right: 8 })
+          Image($r('app.media.search')).width(16).height(16).margin({ right: 8 })
 
           TextInput({ text: this.searchQuery, placeholder: '搜索关键词' })
             .layoutWeight(1)

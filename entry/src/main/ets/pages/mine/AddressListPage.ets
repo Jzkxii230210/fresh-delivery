@@ -1,5 +1,16 @@
 import router from '@ohos.router';
 
+type AddressTagType = 'home' | 'company' | 'school' | 'other';
+
+interface AddressInfo {
+  name: string;
+  phone: string;
+  detail: string;
+  tag: string;
+  isDefault: boolean;
+  tagType: AddressTagType;
+}
+
 @Entry
 @Component
 struct AddressListPage {
@@ -7,14 +18,7 @@ struct AddressListPage {
   @State hasAddress: boolean = true;
 
   // 模拟地址列表数据
-  private addressList: Array<{
-    name: string,
-    phone: string,
-    detail: string,
-    tag: string,
-    isDefault: boolean,
-    tagType: 'home' | 'company' | 'school' | 'other'
-  }> = [
+  private addressList: AddressInfo[] = [
     { name: '张小乙', phone: '13612345678', detail: '广东省深圳市龙华区民福街道 凤凰大道龙岭十二区38栋', tag: '家', isDefault: true, tagType: 'home' },
     { name: '张小乙', phone: '13612345678', detail: '广东省深圳市龙华区民福街道 凤凰大道东方银座C栋3008', tag: '公司', isDefault: false, tagType: 'company' },
     { name: '张小乙', phone: '13612345678', detail: '广东省深圳市龙华区民福街道 凤凰大道民治小学', tag: '学校', isDefault: false, tagType: 'school' },
@@ -28,7 +32,7 @@ struct AddressListPage {
       Column() {
         // 顶部导航栏
         Row() {
-          Image($r('app.media.startIcon'))
+          Image($r('app.media.back'))
             .width(20).height(20).margin({ right: 12 })
             .onClick(() => { router.back(); })
 
@@ -73,14 +77,14 @@ struct AddressListPage {
           Scroll() {
             Column() {
               List({ space: 12 }) {
-                ForEach(this.addressList, (item) => {
+                ForEach(this.addressList, (item: AddressInfo) => {
                   ListItem() {
                     this.AddressCardItem(item)
                   }
                 })
               }
               .width('92%')
-              .padding({ top: 12, bottom: 90 }) // 底部留白防止被固定按钮遮挡
+              .padding({ bottom: 90 }) // 底部留白防止被固定按钮遮挡
             }
             .width('100%')
           }
@@ -104,7 +108,7 @@ struct AddressListPage {
           .borderRadius(22)
           .onClick(() => {
             // TODO: 跳转到添加/编辑地址页
-            // router.pushUrl({ url: 'pages/address/AddressEditPage' })
+             router.pushUrl({ url: 'pages/mine/AddAddressPage' })
           })
       }
       .width('100%')
@@ -118,7 +122,7 @@ struct AddressListPage {
   }
 
   // --- 局部复用组件：单条地址卡片 ---
-  @Builder AddressCardItem(item: { name: string, phone: string, detail: string, tag: string, isDefault: boolean, tagType: string }) {
+  @Builder AddressCardItem(item: AddressInfo) {
     Row() {
       // 左侧标签图标 (家、公司、学校或文字头像)
       Stack({ alignContent: Alignment.Center }) {
@@ -165,12 +169,12 @@ struct AddressListPage {
       .alignItems(HorizontalAlign.Start)
 
       // 右侧编辑按钮 (✏️)
-      Image($r('app.media.startIcon'))
+      Image($r('app.media.more'))
         .width(18)
         .height(18)
         .margin({ left: 12 })
         .onClick(() => {
-          // TODO: 跳转编辑页
+          router.pushUrl({ url: 'pages/mine/AddAddressPage' })
         })
     }
     .width('100%')

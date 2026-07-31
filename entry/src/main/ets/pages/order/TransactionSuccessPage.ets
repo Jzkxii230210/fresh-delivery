@@ -54,9 +54,9 @@ struct TransactionSuccessPage {
 
         // === 2. 更多精选商品标题 ===
         Row() {
-          Image($r('app.media.startIcon')).width(14).height(14).margin({ right: 6 })
+          Image($r('app.media.xihuan')).width(14).height(14).margin({ right: 6 })
           Text('更多精选商品').fontSize(14).fontColor('#FF4D4F')
-          Image($r('app.media.startIcon')).width(14).height(14).margin({ left: 6 })
+          Image($r('app.media.xihuan')).width(14).height(14).margin({ left: 6 })
         }
         .width('100%')
         .justifyContent(FlexAlign.Center)

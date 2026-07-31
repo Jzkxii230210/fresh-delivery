@@ -1,5 +1,15 @@
 import router from '@ohos.router';
 
+interface ShopInfo {
+  name: string;
+  score: string;
+  sales: string;
+  time: string;
+  distance: string;
+  icon?: Resource;
+  shopIndex?: number; // 商家索引，用于跳转到对应的商家详情页
+}
+
 @Entry
 @Component
 struct MyFollowingPage {
@@ -7,11 +17,11 @@ struct MyFollowingPage {
   @State isManaging: boolean = false;
 
   // 模拟关注的店铺列表数据
-  private followedShops: Array<{ name: string, score: string, sales: string, time: string, distance: string }> = [
-    { name: '天虹商场-凤凰城店', score: '4.5分', sales: '月售700+', time: '30分钟', distance: '1.6km' },
-    { name: '大参林药店(凤凰城店)', score: '4.5分', sales: '月售700+', time: '30分钟', distance: '1.6km' },
-    { name: '永辉超市-凤凰城店', score: '4.5分', sales: '月售700+', time: '30分钟', distance: '1.6km' },
-    { name: '大润发(凤凰城店)', score: '4.5分', sales: '月售700+', time: '30分钟', distance: '1.6km' },
+  private followedShops: ShopInfo[] = [
+    { name: '天虹商场-凤凰城店', score: '4.5分', sales: '月售700+', time: '30分钟', distance: '1.6km', icon: $r('app.media.tianhong'), shopIndex: 0 },
+    { name: '大参林药店(凤凰城店)', score: '4.5分', sales: '月售700+', time: '30分钟', distance: '1.6km', icon: $r('app.media.dashenlin'), shopIndex: 3 },
+    { name: '永辉超市-凤凰城店', score: '4.5分', sales: '月售700+', time: '30分钟', distance: '1.6km', icon: $r('app.media.yonghui'), shopIndex: 1 },
+    { name: '大润发(凤凰城店)', score: '4.5分', sales: '月售700+', time: '30分钟', distance: '1.6km', icon: $r('app.media.darunfa'), shopIndex: 2 },
   ];
 
   build() {
@@ -21,7 +31,7 @@ struct MyFollowingPage {
       Column() {
         // 顶部导航栏
         Row() {
-          Image($r('app.media.startIcon'))
+          Image($r('app.media.back'))
             .width(20).height(20).margin({ right: 12 })
             .onClick(() => { router.back(); })
 
@@ -49,14 +59,14 @@ struct MyFollowingPage {
         Scroll() {
           Column() {
             List({ space: 12 }) {
-              ForEach(this.followedShops, (shop) => {
+              ForEach(this.followedShops, (shop: ShopInfo) => {
                 ListItem() {
                   this.ShopCardItem(shop)
                 }
               })
             }
             .width('92%')
-            .padding({ top: 12, bottom: this.isManaging ? 80 : 20 })
+            .padding({ bottom: this.isManaging ? 80 : 20 })
           }
           .width('100%')
         }
@@ -113,7 +123,7 @@ struct MyFollowingPage {
   }
 
   // --- 局部复用组件：单个关注店铺卡片 ---
-  @Builder ShopCardItem(shop: { name: string, score: string, sales: string, time: string, distance: string }) {
+  @Builder ShopCardItem(shop: ShopInfo) {
     Row() {
       // 管理模式下左侧显示复选框
       if (this.isManaging) {
@@ -121,7 +131,7 @@ struct MyFollowingPage {
       }
 
       // 店铺Logo
-      Image($r('app.media.startIcon'))
+      Image(shop.icon ? shop.icon : $r('app.media.startIcon'))
         .width(55)
         .height(55)
         .borderRadius(8)
@@ -190,6 +200,12 @@ struct MyFollowingPage {
     .borderRadius(12)
     .padding(14)
     .shadow({ radius: 4, color: 'rgba(0,0,0,0.03)', offsetY: 2 })
+    .onClick(() => {
+      router.pushUrl({
+        url: 'pages/store/StoreHomePage',
+        params: { shopIndex: shop.shopIndex !== undefined ? shop.shopIndex : 0 }
+      });
+    })
   }
 
   // --- 领券小标签 ---

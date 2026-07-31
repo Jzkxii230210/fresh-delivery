@@ -24,7 +24,7 @@ struct InvoiceHelperPage {
     Column() {
       // === 1. 顶部标题栏 ===
       Row() {
-        Image($r('app.media.startIcon'))
+        Image($r('app.media.back'))
           .width(20).height(20).margin({ right: 12 })
           .onClick(() => { router.back(); })
 
@@ -49,7 +49,6 @@ struct InvoiceHelperPage {
           Row() {
             Row({ space: 4 }) {
               Text('开具发票').fontSize(14).fontColor('#333333').fontWeight(FontWeight.Medium)
-              Image($r('app.media.startIcon')).width(14).height(14) // 说明提示图标
             }
 
             Blank()
@@ -64,7 +63,7 @@ struct InvoiceHelperPage {
           .backgroundColor(Color.White)
           .borderRadius(12)
           .padding(16)
-          .margin({ top: 12, bottom: 12 })
+          .margin({ bottom: 12 })
           .shadow({ radius: 4, color: 'rgba(0,0,0,0.03)', offsetY: 2 })
 
           // --- 发票信息卡片 (开关开启时显示) ---
@@ -109,11 +108,11 @@ struct InvoiceHelperPage {
                         Blank()
 
                         // 编辑抬头图标
-                        Image($r('app.media.startIcon'))
+                        Image($r('app.media.shanchu'))
                           .width(16)
                           .height(16)
                           .onClick(() => {
-                            // router.pushUrl({ url: 'pages/profile/InvoiceEditPage' })
+                             router.pushUrl({ url: 'pages/profile/InvoiceEditPage' })
                           })
                       }
                       .width('100%')
@@ -131,7 +130,6 @@ struct InvoiceHelperPage {
 
               // 添加抬头按钮
               Row() {
-                Image($r('app.media.startIcon')).width(14).height(14).margin({ right: 4 })
                 Text('添加抬头')
                   .fontSize(14)
                   .fontColor('#10C8A7')
@@ -140,7 +138,7 @@ struct InvoiceHelperPage {
               .width('100%')
               .justifyContent(FlexAlign.Center)
               .onClick(() => {
-                // router.pushUrl({ url: 'pages/profile/InvoiceEditPage' })
+                router.pushUrl({ url: 'pages/mine/InvoiceEditPage' });
               })
             }
             .width('92%')

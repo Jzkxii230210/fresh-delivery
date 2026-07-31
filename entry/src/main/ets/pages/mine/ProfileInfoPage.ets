@@ -8,7 +8,7 @@ struct ProfileInfoPage {
     Column() {
       // === 1. 顶部标题栏 ===
       Row() {
-        Image($r('app.media.startIcon'))
+        Image($r('app.media.back'))
           .width(20).height(20).margin({ right: 12 })
           .onClick(() => { router.back(); })
 
@@ -34,11 +34,11 @@ struct ProfileInfoPage {
             Row() {
               Text('头像').fontSize(14).fontColor('#333333')
               Blank()
-              Image($r('app.media.startIcon'))
+              Image($r('app.media.big'))
                 .width(44).height(44)
                 .borderRadius(22)
                 .margin({ right: 6 })
-              Image($r('app.media.startIcon')).width(12).height(12)
+              Image($r('app.media.more')).width(12).height(12)
             }
             .width('100%')
             .padding(16)
@@ -83,13 +83,13 @@ struct ProfileInfoPage {
                 .borderRadius(2)
                 .margin({ right: 8 })
 
-              Text('张小乙是吃货').fontSize(13).fontColor('#666666').margin({ right: 6 })
-              Image($r('app.media.startIcon')).width(12).height(12)
+              Text('毕敬明是吃货').fontSize(13).fontColor('#666666').margin({ right: 6 })
+              Image($r('app.media.more')).width(12).height(12)
             }
             .width('100%')
             .padding(16)
             .onClick(() => {
-              // router.pushUrl({ url: 'pages/setting/EditNicknamePage' })
+              router.pushUrl({ url: 'pages/mine/EditNicknamePage' })
             })
           }
           .width('92%')

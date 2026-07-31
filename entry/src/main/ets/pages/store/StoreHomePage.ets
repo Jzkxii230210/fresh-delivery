@@ -1,14 +1,32 @@
 import router from '@ohos.router';
+import { NEARBY_SHOPS, NearbyShop, RECOMMEND_PRODUCTS, RecommendProduct } from '../../common/HomeData';
+
+// 路由参数接口
+interface RouterParams {
+  shopIndex?: number;
+}
 
 @Entry
 @Component
 struct StoreHomePage {
   @State currentCategoryIndex: number = 0;
 
+  // 当前商家索引
+  private shopIndex: number = 0;
+  private shop: NearbyShop = NEARBY_SHOPS[0];
+
   // 模拟分类数据
   private categories: string[] = ['年货节', '蔬菜豆品', '肉禽蛋', '海鲜水产', '水果鲜花', '乳品烘焙', '冷冻食品', '粮油调味', '酒水饮料', '休闲零食', '生活用品'];
-  // 模拟商品数据
-  private mockProducts: number[] = [1, 2, 3, 4, 5, 6];
+
+  aboutToAppear() {
+    const params = router.getParams() as RouterParams;
+    if (params && params.shopIndex !== undefined) {
+      this.shopIndex = params.shopIndex;
+      if (this.shopIndex >= 0 && this.shopIndex < NEARBY_SHOPS.length) {
+        this.shop = NEARBY_SHOPS[this.shopIndex];
+      }
+    }
+  }
 
   build() {
     // 外层 Stack 用于把底部购物车悬浮在整个页面之上
@@ -19,7 +37,7 @@ struct StoreHomePage {
         // === 1. 顶部 Header 区 (背景图 + 导航 + 店铺卡片) ===
         Stack({ alignContent: Alignment.Top }) {
           // 1.1 店铺背景图 (用深色占位)
-          Image($r('app.media.startIcon'))
+          Image($r('app.media.beijing'))
             .width('100%')
             .height(160)
             .objectFit(ImageFit.Cover)
@@ -28,13 +46,13 @@ struct StoreHomePage {
           Column() {
             // 1.2 顶部导航栏
             Row() {
-              Image($r('app.media.startIcon')) // 返回按钮
+              Image($r('app.media.back')) // 返回按钮
                 .width(20).height(20).margin({ right: 12 })
                 .onClick(() => { router.back(); })
 
               // 店内搜索框
               Row() {
-                Image($r('app.media.startIcon')).width(16).height(16).margin({ right: 6 })
+                Image($r('app.media.search')).width(16).height(16).margin({ right: 6 })
                 Text('搜索店内商品').fontSize(13).fontColor('#999999')
               }
               .layoutWeight(1)
@@ -53,7 +71,7 @@ struct StoreHomePage {
               .margin({ left: 12, right: 12 })
 
               // 分享图标
-              Image($r('app.media.startIcon')).width(20).height(20)
+              Image($r('app.media.fenxiang')).width(20).height(20)
             }
             .width('100%')
             .padding({ left: 16, right: 16, top: 16 })
@@ -62,17 +80,17 @@ struct StoreHomePage {
             Column() {
               // 头部：Logo + 店名
               Row() {
-                Image($r('app.media.startIcon')) // 商家 Logo
+                Image(this.shop.icon) // 商家 Logo
                   .width(40).height(40).borderRadius(4).margin({ right: 10 })
 
                 Column() {
                   Row() {
-                    Text('天虹商场-凤凰城店').fontSize(16).fontWeight(FontWeight.Bold).fontColor('#333333')
-                    Image($r('app.media.startIcon')).width(12).height(12).margin({ left: 4 }) // 箭头
+                    Text(this.shop.name).fontSize(16).fontWeight(FontWeight.Bold).fontColor('#333333')
+                    Image($r('app.media.more')).width(12).height(12).margin({ left: 4 }) // 箭头
                   }.margin({ bottom: 6 })
 
                   Row() {
-                    Text('4.3分').fontSize(11).fontColor('#007DFF').backgroundColor('#E5F2FF').padding({ left: 4, right: 4 }).borderRadius(2).margin({ right: 8 })
+                    Text(`${this.shop.rating}分`).fontSize(11).fontColor('#007DFF').backgroundColor('#E5F2FF').padding({ left: 4, right: 4 }).borderRadius(2).margin({ right: 8 })
                     Text('达达快送  运费 ￥4').fontSize(11).fontColor('#666666')
                   }
                 }
@@ -99,6 +117,7 @@ struct StoreHomePage {
               .listDirection(Axis.Horizontal)
               .scrollBar(BarState.Off)
               .width('100%')
+              .height(28)
               .margin({ bottom: 10 })
 
               // 满减信息
@@ -107,6 +126,7 @@ struct StoreHomePage {
                 Text('维达纸巾满49减5，满79减10，满99减15').fontSize(11).fontColor('#FF8C00').maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis }).layoutWeight(1)
               }
               .width('100%')
+              .constraintSize({ minWidth: 0 })
             }
             .width('92%')
             .backgroundColor(Color.White)
@@ -151,10 +171,8 @@ struct StoreHomePage {
           Column() {
             // 右侧顶部过滤栏
             Row() {
-              Text(this.categories[this.currentCategoryIndex]).fontSize(13).fontWeight(FontWeight.Bold).fontColor('#333333')
-              Blank()
               Text('综合排序').fontSize(11).fontColor('#666666')
-              Image($r('app.media.startIcon')).width(10).height(10).margin({ left: 2, right: 12 }) // 下拉箭头
+              Image($r('app.media.xiala')).width(10).height(10).margin({ left: 2, right: 12 }) // 下拉箭头
               Text('减免运费').fontSize(11).fontColor('#666666')
             }
             .width('100%')
@@ -163,10 +181,16 @@ struct StoreHomePage {
 
             // 滚动商品列表
             List() {
-              ForEach(this.mockProducts, (item: number) => {
+              ForEach(RECOMMEND_PRODUCTS, (product: RecommendProduct, index: number) => {
                 ListItem() {
-                  this.StoreProductCard()
+                  this.StoreProductCard(product)
                 }
+                .onClick(() => {
+                  router.pushUrl({
+                    url: 'pages/store/ProductDetailPage',
+                    params: { productIndex: index }
+                  });
+                })
               })
               // 底部留出空间，防止被悬浮的购物车挡住
               ListItem() { Row().height(70).width('100%') }
@@ -213,20 +237,20 @@ struct StoreHomePage {
   }
 
   // --- 局部复用组件：店内商品卡片 ---
-  @Builder StoreProductCard() {
+  @Builder StoreProductCard(product: RecommendProduct) {
     Row() {
-      Image($r('app.media.startIcon')).width(76).height(76).borderRadius(8).margin({ right: 10 })
+      Image(product.image).width(76).height(76).borderRadius(8).margin({ right: 10 })
 
       Column() {
-        Text('花菜 约500g')
+        Text(product.name)
           .fontSize(14).fontColor('#333333').fontWeight(FontWeight.Medium).margin({ bottom: 6 }).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
 
-        Text('产地直供，营养丰富，多...')
+        Text(product.desc)
           .fontSize(11).fontColor('#999999').margin({ bottom: 12 }).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
 
         Row() {
-          Text('¥7.99').fontSize(16).fontColor('#FF4D4F').fontWeight(FontWeight.Bold).margin({ right: 6 })
-          Text('¥9.90').fontSize(12).fontColor('#999999').decoration({ type: TextDecorationType.LineThrough })
+          Text(product.price).fontSize(16).fontColor('#FF4D4F').fontWeight(FontWeight.Bold).margin({ right: 6 })
+          Text(product.oldPrice).fontSize(12).fontColor('#999999').decoration({ type: TextDecorationType.LineThrough })
           Blank()
           // 亮绿色加购按钮
           Stack({ alignContent: Alignment.Center }) {
